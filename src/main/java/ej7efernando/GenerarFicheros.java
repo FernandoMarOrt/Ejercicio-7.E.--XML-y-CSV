@@ -6,6 +6,7 @@ package ej7efernando;
 
 import java.awt.Robot;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,6 +16,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 /**
  *
@@ -22,7 +26,7 @@ import java.util.List;
  */
 public class GenerarFicheros {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws JAXBException {
 
         List<Factura> listaFacturas = new ArrayList<>();
 
@@ -43,8 +47,9 @@ public class GenerarFicheros {
         //Genero el fichero csv a partir de la lista de facturas
         generarFichero("./csv/facturas.csv", listaFacturas);
 
-        //Genero el fichero csv a partir de la lista de facturas
-        generarFichero("./xml/facturas.xml", listaFacturas);
+        //Genero el fichero xml a partir de la lista de facturas
+//        generarFichero("./xml/facturas.xml", listaFacturas);
+        generarFicheroXML(listaFacturas, "Fichero con las facturas xml", "./xml/facturas.xml");
         
         crearDirectorio("facturascsv");
         
@@ -105,6 +110,42 @@ public class GenerarFicheros {
             }
 
         }
+
+    }
+    
+    
+    public static void generarFicheroXML(List<Factura> listAux, String descripcion,String ruta) throws JAXBException {
+
+        // Se preparan los objetos a utilizar, en esta caso un catálogo
+        CatalogoFacturas catalogo = new CatalogoFacturas();
+        catalogo.setLista((ArrayList<Factura>) listAux);
+        catalogo.setDescripcion(descripcion);
+
+        // Crea el contexto JAXB. Se encarga de definir los objetos 
+        // que vamos a guardar. En nuestro caso sólo el tipo CatalogoMuebles
+        JAXBContext contexto = JAXBContext.newInstance(CatalogoFacturas.class);
+
+        // El contexto JAXB permite crear un objeto Marshaller, que sirve para
+        // generar la estructura del fichero XML 
+        // El proceso de pasar objetos Java (CatalogoMuebles) a ficheros XML 
+        // se conoce como "marshalling" o "serialización"
+        Marshaller serializador = contexto.createMarshaller();
+
+        // Especificamos que la propiedad del formato de salida
+        // del serializador sea true, lo que implica que el formato se 
+        // realiza con indentación y saltos de línea
+        serializador.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+        // Llamando al método de serialización marshal (sobrecargado) se pueden
+        // serializar objetos java en formato XML y volcarlos donde necesitemos:
+        // consola, ficheros. El proceso consiste en que el contexto es el 
+        // encargo de leer los objetos java, pasarlos al serializador y éste 
+        // crear la salida de serialización
+        // Serialización y salida por consola
+        serializador.marshal(catalogo, System.out);
+
+        // Volcado al fichero xml
+        serializador.marshal(catalogo, new File(ruta));
 
     }
 

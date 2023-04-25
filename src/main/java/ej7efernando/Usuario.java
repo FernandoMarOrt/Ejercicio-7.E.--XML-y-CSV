@@ -6,6 +6,12 @@ package ej7efernando;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -36,6 +42,11 @@ public class Usuario {
         Factura f = crearFacturaArchivo(facturaLeer);
         
         System.out.println(f.toString());
+        
+        borrarElemento(facturaLeer);
+        
+        System.out.println("");
+        listarDirectorio("./facturascsv");
     }
 
     public static void listarDirectorio(String ruta) {
@@ -91,5 +102,21 @@ public class Usuario {
 
         return f;
     }
+    
+     public static void borrarElemento(String ruta) {
+        Path file = Paths.get("./facturascsv/"+ruta);
+        try {
+            Files.delete(file);
+        } catch (NoSuchFileException nsfe) {
+            System.out.println("No se puede borrar " + ruta + " porque no existe");
+        } catch (DirectoryNotEmptyException dnee) {
+            System.out.println("No se puede borrar el directorio porque no está vacío");
+        } catch (IOException e) {
+            System.out.println("Problema borrando el elemento " + ruta);
+        }
+    }
+     
+     
+     
 
 }

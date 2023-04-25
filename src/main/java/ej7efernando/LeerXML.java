@@ -4,9 +4,12 @@
  */
 package ej7efernando;
 
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.Scanner;
+import java.util.ArrayList;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 /**
  *
@@ -14,31 +17,20 @@ import java.util.Scanner;
  */
 public class LeerXML {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws JAXBException,
+            FileNotFoundException {
 
-        // Fichero a leer
-        String idFichero = "./xml/facturas.xml";
+        // Crea el contexto JAXB 
+        JAXBContext contexto = JAXBContext.newInstance(CatalogoFacturas.class);
+        // Crea el objeto Unmarshaller
+        Unmarshaller um = contexto.createUnmarshaller();
 
-        // Variables para guardar los datos que se van leyendo
-        String linea;
+        // Llama al método de unmarshalling
+        CatalogoFacturas catalogo = (CatalogoFacturas) um.unmarshal(new File("./xml/facturas.xml"));
 
-        System.out.println("Leyendo el fichero: " + idFichero);
+        ArrayList<Factura> listaFacturas = catalogo.getListaFactura();
 
-        // Inicialización del flujo "datosFichero" en función del archivo llamado "idFichero"
-        // Estructura try-with-resources. Permite cerrar los recursos una vez finalizadas
-        // las operaciones con el archivo
-        try ( Scanner datosFichero = new Scanner(new FileReader(idFichero))) {
-
-            // Mientras haya líneas por leer
-            while (datosFichero.hasNextLine()) {
-
-                linea = datosFichero.nextLine(); //Se lee la línea
-                System.out.println(linea); // Se imprime en pantalla
-            }
-
-        } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
-        }
+        listaFacturas.forEach(System.out::println);
 
     }
 
